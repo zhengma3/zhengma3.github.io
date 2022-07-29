@@ -1,0 +1,171 @@
+<html>
+<body>
+<meta charset="utf-8">
+
+<!-- Load d3.js  and annotation-->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+
+<h1>Airbnb Rental Cost Data Visulization</h1>
+<p>Airbnb is an American company that operates an online marketplace for lodging, primarily homestays for vacation rentals, and tourism activities. 
+  Based in San Francisco, California, the platform is accessible via website and mobile app.
+  Charts below shows some of the Airbnb rental cost for partial regions in United States. </p>
+<p>In this site, there are three different charts: the random select 10 locations, top 10 cheapest locations, and top 10 most expensive locations.
+    The top 10 cheapeast locations shows the per night price of the Airbnb is greater than $63, and top 10 most expensive 
+    locations shows the per night price is less than $276.
+</p>
+<!-- Add 2 buttons -->
+<button onclick="update(data1)">Randome View of 10 Locations</button>
+<button onclick="update(data2)">Top 10 Cheapest Locations</button>
+<button onclick="update(data3)">Top 10 Expensive Locations</button>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+<script>
+
+    // create 2 data_set
+    var data1 = [
+       {group: "Hyde Park", value: 98.9},
+       {group: "O'Hare", value: 125.13},
+       {group: "West Town", value: 162.9},
+       {group: "Lincoln Park", value: 196.32},
+       {group: "Near North Side", value: 275.8},
+       {group: "Lake View", value: 194.99},
+       {group: "Pullman", value: 74.33},
+       {group: "Chatham", value: 70.29},
+       {group: "Irving Park", value: 93.36},
+       {group: "Near South Side", value: 222.82}
+    ];
+    
+    var data2 = [
+       {group: "South Chicago", value: 27.83},
+       {group: "West Englewood", value: 33.04},
+       {group: "Calumet Heights", value: 41.69},
+       {group: "North Lawndale", value: 46.58},
+       {group: "West Elsdon", value: 47.7},
+       {group: "Washington Heights", value: 54},
+       {group: "Riverdale", value: 60},
+       {group: "South Lawndale", value: 60.79},
+       {group: "Englewood", value: 61.81},
+       {group: "West Lawn", value: 62.69}
+    ];
+    
+    var data3 = [
+       {group: "Near North Side", value: 275.8},
+       {group: "Archer Heights", value: 248.33},
+       {group: "Near South Side", value: 222.82},
+       {group: "Loop", value: 217.85},
+       {group: "Lincoln Park", value: 196.32},
+       {group: "North Center", value: 180.83},
+       {group: "Lake View", value: 194.99},
+       {group: "Washington Park", value: 169.62},
+       {group: "West Town", value: 162.9},
+       {group: "Uptown", value: 150.77}
+       
+    ];
+    // set the dimensions and margins of the graph
+    var margin = {top: 30, right: 30, bottom: 70, left: 60},
+        width = 1000 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
+    
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+      .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform",
+              "translate(" + margin.left + "," + margin.top + ")");
+    
+
+    const annotations_first = [
+    {
+    note: {
+      label: "The most expensive airbnb",
+      title: "Avg. price for airbnb in region"
+    },
+    connector: {
+            end: "arrow" // 'dot' also available
+          },
+    color: ["black"],
+    x: 450,
+    y: 150,
+    dy: -20,
+    dx: 80
+    }]
+
+
+    const create_annotations_first = d3.annotation()
+      .annotations(annotations_first)
+
+    const annotations_last = [
+    {
+    note: {
+      label: "The cheapest airbnb",
+      title: "Avg. price for airbnb in region"
+    },
+    connector: {
+            end: "arrow" // 'dot' also available
+          },
+    color: ["black"],
+    x: 670,
+    y: 370,
+    dy: -60,
+    dx: 30
+    }]
+
+
+    const create_annotations_last = d3.annotation()
+      .annotations(annotations_last)
+    
+    // A function that create / update the plot for a given variable:
+    function update(data) {
+     
+      d3.selectAll('svg > g > *').remove();
+      // X axis
+      var x = d3.scaleBand()
+        .range([ 0, width ])
+        .domain(data.map(function(d) { return d.group; }))
+        .padding(0.2);
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x))
+    
+    // Add Y axis
+      var y = d3.scaleLinear()
+        .domain([0, 300])
+        .range([ height, 0]);
+      svg.append("g")
+        .attr("class", "myYaxis")
+        .call(d3.axisLeft(y));
+
+      var u = svg.selectAll("rect")
+        .data(data)
+    
+      u
+        .enter()
+        .append("rect")
+        .merge(u)
+        .transition()
+        .duration(1000)
+          .attr("x", function(d) { return x(d.group); })
+          .attr("y", function(d) { return y(d.value); })
+          .attr("width", x.bandwidth())
+          .attr("height", function(d) { return height - y(d.value); })
+          .attr("fill", "#335e85")
+
+      svg.append("g")
+      .call(create_annotations_first)
+      svg.append("g")
+      .call(create_annotations_last)
+
+    
+    }
+    
+
+    // Initialize the plot with the first dataset
+    update(data1)
+    
+    </script>
+</body>
+</html>
